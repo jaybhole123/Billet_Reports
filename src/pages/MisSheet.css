@@ -1,0 +1,529 @@
+/* Page background and general wrapper */
+.mis-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding-bottom: 40px;
+  background-color: #f1f5f9;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000000;
+}
+
+/* Action Toolbar above the report */
+.mis-top-toolbar {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.mis-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mis-toolbar-badge {
+  background: #0d47a1;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.mis-toolbar-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.mis-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mis-date-picker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.mis-date-picker-wrap input {
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #94a3b8;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+}
+
+.mis-btn {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+/* Edit Mode Toggle Buttons */
+.mis-btn-edit-inactive {
+  background: #f8fafc;
+  color: #0284c7;
+  border: 1.5px solid #0284c7;
+}
+
+.mis-btn-edit-inactive:hover {
+  background: #e0f2fe;
+}
+
+.mis-btn-edit-active {
+  background: #ea580c;
+  color: #ffffff;
+  border: 1.5px solid #c2410c;
+  box-shadow: 0 2px 4px rgba(234, 88, 12, 0.3);
+}
+
+.mis-btn-edit-active:hover {
+  background: #c2410c;
+}
+
+.mis-btn-pdf {
+  background: #dc2626;
+  color: #ffffff;
+  border: 1px solid #b91c1c;
+}
+
+.mis-btn-pdf:hover {
+  background: #b91c1c;
+}
+
+.mis-btn-primary {
+  background: #0284c7;
+  color: #ffffff;
+  border: 1px solid #0369a1;
+}
+
+.mis-btn-primary:hover {
+  background: #0369a1;
+}
+
+.mis-btn-outline {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.mis-btn-outline:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+/* ========================================================================== */
+/* EXACT PDF SHEET PAPER LAYOUT */
+/* ========================================================================== */
+
+.mis-pdf-paper {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  border: 1.5px solid #000000;
+  overflow-x: auto;
+  transition: border-color 0.2s ease;
+}
+
+.mis-pdf-paper.edit-mode-on {
+  border: 2px solid #ea580c;
+  box-shadow: 0 4px 18px rgba(234, 88, 12, 0.18);
+}
+
+.mis-pdf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11.5px;
+  color: #000000;
+  background: #ffffff;
+  table-layout: fixed;
+}
+
+/* All Table Cells Borders */
+.mis-pdf-table td {
+  border: 1px solid #000000 !important;
+  padding: 3px 8px;
+  height: 22px;
+  line-height: 1.25;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+/* 1. MAIN HEADER ROW (Deep Navy Blue #113f59) */
+.mis-pdf-header-row td {
+  background: #113f59 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+  padding: 6px 12px;
+  height: 30px;
+}
+
+.mis-pdf-title-cell {
+  font-size: 13.5px;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 0.04em;
+  color: #ffffff !important;
+}
+
+.mis-pdf-date-cell {
+  font-size: 13px;
+  font-weight: 800;
+  text-align: right;
+  letter-spacing: 0.02em;
+  color: #ffffff !important;
+  padding-right: 14px !important;
+}
+
+/* 2. SUBHEADER: SIZE | QTY */
+.mis-pdf-subth-row td {
+  background: #ffffff;
+  color: #000000;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  border: 1px solid #000000 !important;
+  padding: 3px 8px;
+}
+
+.mis-empty-col {
+  background: #ffffff;
+}
+
+.mis-th-center {
+  text-align: center;
+  font-weight: 800;
+}
+
+/* 3. CATEGORY MERGED CELL (Left Column) */
+.mis-category-merged-cell {
+  background: #ffffff;
+  color: #000000;
+  font-weight: 800;
+  font-size: 11.5px;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid #000000 !important;
+  letter-spacing: 0.02em;
+}
+
+.mis-add-row-mini-btn {
+  display: block;
+  margin: 4px auto 0 auto;
+  background: #ea580c;
+  color: #ffffff;
+  border: 1px solid #c2410c;
+  border-radius: 3px;
+  font-size: 10px;
+  padding: 1px 6px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.15s;
+}
+
+.mis-add-row-mini-btn:hover {
+  background: #c2410c;
+}
+
+.mis-del-row-btn {
+  display: inline-block;
+  color: #ef4444;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 0 4px;
+  margin-left: 4px;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+.mis-del-row-btn:hover {
+  background: #fee2e2;
+}
+
+/* 4. ITEM DESCRIPTION CELL & INPUT */
+.mis-desc-cell {
+  color: #000000;
+  font-weight: 700;
+  font-size: 11px;
+  text-align: left;
+  padding: 0 8px !important;
+  background: #ffffff;
+}
+
+.mis-desc-input {
+  width: 100% !important;
+  border: 1px solid #94a3b8 !important;
+  background: #fffbeb !important;
+  text-align: left !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  color: #000000 !important;
+  padding: 1px 4px !important;
+  margin: 0 !important;
+  outline: none !important;
+  border-radius: 2px !important;
+  box-sizing: border-box !important;
+}
+
+.mis-desc-input:focus {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+}
+
+/* 5. QUANTITY CELL (Right-aligned) */
+.mis-qty-cell {
+  text-align: right !important;
+  font-weight: 800;
+  font-size: 11.5px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000000;
+  padding: 0 10px 0 0 !important;
+  background: #ffffff;
+}
+
+.mis-bold-qty {
+  font-weight: 800 !important;
+  padding-right: 10px !important;
+}
+
+/* 6. CELL INLINE INPUT */
+.mis-cell-input {
+  width: 100% !important;
+  border: 1px solid #94a3b8 !important;
+  background: #fffbeb !important;
+  text-align: right !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  color: #000000 !important;
+  padding: 1px 6px !important;
+  margin: 0 !important;
+  outline: none !important;
+  border-radius: 2px !important;
+  box-sizing: border-box !important;
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+.mis-cell-input::-webkit-outer-spin-button,
+.mis-cell-input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+.mis-cell-input:focus {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+}
+
+/* 7. SUBTOTAL ROWS (Light Pastel Blue #d8e8f8) */
+.mis-pdf-subtotal-row td {
+  background: #d8e8f8 !important;
+  color: #000000;
+  font-weight: 800;
+  border: 1px solid #000000 !important;
+}
+
+.mis-total-label-cell {
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  font-size: 11px;
+}
+
+/* 8. SUMMARY STAT ROWS & INPUTS */
+.mis-summary-stat-row td {
+  background: #ffffff;
+  border: 1px solid #000000 !important;
+  padding: 3px 8px !important;
+}
+
+.mis-summary-label-cell {
+  text-align: center;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 3px 8px !important;
+}
+
+.mis-summary-desc-input {
+  width: 100% !important;
+  border: 1px solid #94a3b8 !important;
+  background: #fffbeb !important;
+  text-align: center !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  color: #000000 !important;
+  padding: 1px 4px !important;
+  margin: 0 !important;
+  outline: none !important;
+  border-radius: 2px !important;
+  box-sizing: border-box !important;
+}
+
+.mis-summary-desc-input:focus {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+}
+
+.mis-bold-label {
+  font-weight: 900 !important;
+}
+
+/* 9. YESTERDAY INCOMING & OUTGOING MATERIALS HEADER */
+.mis-pdf-section-title-row td {
+  background: #ffffff;
+  border: 1px solid #000000 !important;
+  padding: 4px 8px;
+}
+
+.mis-pdf-section-title-cell {
+  text-align: center;
+  font-weight: 800;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  color: #000000;
+  padding: 4px !important;
+}
+
+.mis-section-title-input {
+  width: 100% !important;
+  border: 1px solid #94a3b8 !important;
+  background: #fffbeb !important;
+  text-align: center !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.03em !important;
+  color: #000000 !important;
+  padding: 2px 4px !important;
+  outline: none !important;
+  border-radius: 2px !important;
+}
+
+.mis-section-title-input:focus {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+}
+
+/* 10. PRODUCTION HEADER & ITEMS */
+.mis-prod-header-cell {
+  text-align: center;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 3px 8px !important;
+}
+
+.mis-prod-item-cell {
+  text-align: center;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 8px !important;
+}
+
+/* 11. PENDING OUTGOING */
+.mis-pending-label-cell {
+  text-align: center;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 8px !important;
+}
+
+/* 12. NOTE:- ROW */
+.mis-note-pdf-row td {
+  background: #ffffff;
+  border: 1px solid #000000 !important;
+  vertical-align: top;
+  padding: 4px 8px;
+}
+
+.mis-note-title-cell {
+  font-weight: 900;
+  font-size: 11.5px;
+  color: #dc2626 !important;
+  vertical-align: top;
+  padding-top: 6px !important;
+}
+
+.mis-note-content-cell {
+  padding: 2px 6px !important;
+}
+
+.mis-note-pdf-textarea {
+  width: 100%;
+  border: 1px solid #94a3b8;
+  background: #fffbeb;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 11.5px;
+  color: #000000;
+  min-height: 24px;
+  padding: 3px 6px;
+  border-radius: 2px;
+}
+
+/* Toast Message */
+.mis-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #113f59;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  z-index: 999;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
