@@ -669,20 +669,6 @@ export default function YesterdayOutgoing() {
             </select>
 
             <DateNavigator value={selectedDate} onChange={setSelectedDate} />
-
-            {(search || selectedVendor || selectedSpec) && (
-              <button
-                type="button"
-                className="yo-btn yo-btn-sm"
-                onClick={() => {
-                  setSearch('');
-                  setSelectedVendor('');
-                  setSelectedSpec('');
-                }}
-              >
-                Reset
-              </button>
-            )}
           </div>
         </div>
 

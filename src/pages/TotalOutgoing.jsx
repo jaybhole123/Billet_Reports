@@ -708,17 +708,6 @@ export default function TotalOutgoing() {
             ))}
           </select>
 
-          <button
-            className="sp-btn sp-btn-sm"
-            onClick={() => {
-              setSearch('');
-              setSelectedGroup('');
-              setSelectedParty('');
-            }}
-          >
-            Reset
-          </button>
-
           <div style={{ flex: 1 }} />
 
           <button className="sp-btn sp-btn-sm danger-outline" onClick={handleClearAll}>

@@ -874,15 +874,6 @@ export default function NormalMaterialPurchase() {
               onChange={(e) => setSearchQ(e.target.value)}
             />
           </div>
-
-          <label className="nmp-checkbox-label">
-            <input
-              type="checkbox"
-              checked={onlyPending}
-              onChange={(e) => setOnlyPending(e.target.checked)}
-            />
-            Sirf Pending (Balance &gt; 0)
-          </label>
         </div>
       </div>
 
