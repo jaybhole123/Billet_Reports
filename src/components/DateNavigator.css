@@ -1,0 +1,105 @@
+/* Modern Date Navigator Pill matching exact System Warm Orange Theme */
+.date-nav-pill {
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1.5px solid #fed7aa;
+  border-radius: 8px;
+  padding: 3px 8px;
+  box-shadow: 0 1px 3px rgba(234, 88, 12, 0.08);
+  font-family: inherit;
+  user-select: none;
+  gap: 8px;
+  height: 36px;
+  box-sizing: border-box;
+}
+
+.date-nav-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.date-nav-arrow {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #fed7aa;
+  border-radius: 6px;
+  color: #9a3412;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.date-nav-arrow:hover {
+  background: #fff7ed;
+  border-color: #ea580c;
+  color: #c2410c;
+}
+
+.date-nav-today {
+  height: 28px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff7ed;
+  border: 1px solid #ffedd5;
+  border-radius: 6px;
+  color: #ea580c;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.date-nav-today:hover {
+  background: #ffedd5;
+  color: #c2410c;
+  border-color: #fed7aa;
+}
+
+.date-nav-divider {
+  width: 1px;
+  height: 18px;
+  background: #fed7aa;
+}
+
+.date-nav-label-box {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.date-nav-cal-icon {
+  color: #ea580c;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.date-nav-display-text {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.date-nav-hidden-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+

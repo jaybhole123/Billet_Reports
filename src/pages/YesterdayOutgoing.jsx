@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import DateNavigator from '../components/DateNavigator';
 import './YesterdayOutgoing.css';
 
 const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -41,8 +42,7 @@ export default function YesterdayOutgoing() {
   const [search, setSearch] = useState('');
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedSpec, setSelectedSpec] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
 
   // Modals
   const [modalOpen, setModalOpen] = useState(false);
@@ -337,10 +337,9 @@ export default function YesterdayOutgoing() {
     const q = search.trim().toLowerCase();
     return data
       .filter((r) => {
+        if (selectedDate && r.date && r.date !== selectedDate) return false;
         if (selectedVendor && r.vendor !== selectedVendor) return false;
         if (selectedSpec && r.spec !== selectedSpec) return false;
-        if (dateFrom && r.date < dateFrom) return false;
-        if (dateTo && r.date > dateTo) return false;
         if (q) {
           const combined = `${r.sn} ${r.vendor} ${r.cons} ${r.item} ${r.spec} ${r.desc} ${r.inv} ${r.veh} ${r.rem}`.toLowerCase();
           if (!combined.includes(q)) return false;
@@ -348,7 +347,7 @@ export default function YesterdayOutgoing() {
         return true;
       })
       .sort((a, b) => (a.sn || 0) - (b.sn || 0));
-  }, [data, search, selectedVendor, selectedSpec, dateFrom, dateTo]);
+  }, [data, search, selectedVendor, selectedSpec, selectedDate]);
 
   // KPI calculations
   const totalQty = useMemo(() => {
@@ -492,9 +491,6 @@ export default function YesterdayOutgoing() {
           <button className="yo-btn yo-btn-primary pri" onClick={handleOpenAdd}>
             ＋ New Entry
           </button>
-          <button className="yo-btn" onClick={handleExport} title="Export current register to Excel">
-            📤 Export Excel
-          </button>
           <button className="yo-btn" onClick={handleDownloadTemplate} title="Download Excel format template">
             ⬇ Template
           </button>
@@ -619,84 +615,75 @@ export default function YesterdayOutgoing() {
 
       {/* Main Table Card */}
       <div className="yo-table-card">
-        {/* Single Row Action Toolbar */}
+        {/* Clean Executive Toolbar */}
         <div className="yo-toolbar-card">
-          <div className="yo-toolbar-title">
-            <span>Dispatch Table</span>
+          <div className="yo-toolbar-left">
+            <span className="yo-toolbar-title-text">Dispatch Table</span>
             <span className="yo-badge">{filteredData.length} records</span>
+            <button
+              type="button"
+              className="yo-btn yo-btn-danger yo-btn-clear"
+              onClick={handleClearAll}
+              title="Clear all records"
+            >
+              🗑 Clear All
+            </button>
           </div>
 
-          <input
-            type="text"
-            className="yo-input"
-            style={{ width: '220px' }}
-            placeholder="Search vendor, veh, inv..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <div className="yo-toolbar-right">
+            <input
+              type="text"
+              className="yo-input"
+              style={{ width: '190px' }}
+              placeholder="Search vendor, veh, inv..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
 
-          <select
-            className="yo-select"
-            style={{ maxWidth: '180px' }}
-            value={selectedVendor}
-            onChange={(e) => setSelectedVendor(e.target.value)}
-          >
-            <option value="">All Vendors</option>
-            {vendorList.map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
+            <select
+              className="yo-select"
+              style={{ maxWidth: '140px' }}
+              value={selectedVendor}
+              onChange={(e) => setSelectedVendor(e.target.value)}
+            >
+              <option value="">All Vendors</option>
+              {vendorList.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
 
-          <select
-            className="yo-select"
-            style={{ maxWidth: '160px' }}
-            value={selectedSpec}
-            onChange={(e) => setSelectedSpec(e.target.value)}
-          >
-            <option value="">All Specs</option>
-            {specList.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+            <select
+              className="yo-select"
+              style={{ maxWidth: '130px' }}
+              value={selectedSpec}
+              onChange={(e) => setSelectedSpec(e.target.value)}
+            >
+              <option value="">All Specs</option>
+              {specList.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
 
-          <input
-            type="date"
-            className="yo-input"
-            title="Date From"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-          />
+            <DateNavigator value={selectedDate} onChange={setSelectedDate} />
 
-          <input
-            type="date"
-            className="yo-input"
-            title="Date To"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-          />
-
-          <button
-            className="yo-btn yo-btn-sm"
-            onClick={() => {
-              setSearch('');
-              setSelectedVendor('');
-              setSelectedSpec('');
-              setDateFrom('');
-              setDateTo('');
-            }}
-          >
-            Reset
-          </button>
-
-          <div style={{ flex: 1 }} />
-
-          <button className="yo-btn yo-btn-sm yo-btn-danger" onClick={handleClearAll}>
-            🗑 Clear All
-          </button>
+            {(search || selectedVendor || selectedSpec) && (
+              <button
+                type="button"
+                className="yo-btn yo-btn-sm"
+                onClick={() => {
+                  setSearch('');
+                  setSelectedVendor('');
+                  setSelectedSpec('');
+                }}
+              >
+                Reset
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Specification Breakdown Chips Bar */}

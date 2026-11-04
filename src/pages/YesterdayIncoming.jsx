@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import DateNavigator from '../components/DateNavigator';
 import './YesterdayIncoming.css';
 
 const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -36,8 +37,7 @@ export default function YesterdayIncoming() {
 
   const [searchQ, setSearchQ] = useState('');
   const [filterItem, setFilterItem] = useState('');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [message, setMessage] = useState({ text: '', isErr: false });
 
   // Modal State
@@ -351,9 +351,8 @@ export default function YesterdayIncoming() {
   const { filteredRows, stats, groupedOrders } = useMemo(() => {
     const q = searchQ.trim().toLowerCase();
     const rows = data.filter((r) => {
+      if (selectedDate && r.date && r.date !== selectedDate) return false;
       if (filterItem && r.item !== filterItem) return false;
-      if (fromDate && r.date < fromDate) return false;
-      if (toDate && r.date > toDate) return false;
       if (q) {
         const text = [r.party, r.inv, r.truck, r.do, r.thr, r.item, r.rem].join(' ').toLowerCase();
         if (!text.includes(q)) return false;
@@ -384,7 +383,7 @@ export default function YesterdayIncoming() {
         totalVal,
       },
     };
-  }, [data, searchQ, filterItem, fromDate, toDate]);
+  }, [data, searchQ, filterItem, selectedDate]);
 
   return (
     <div
@@ -500,10 +499,6 @@ export default function YesterdayIncoming() {
             + New Entry
           </button>
 
-          <button type="button" className="yi-btn" onClick={handleExportExcel}>
-            📤 Export Excel
-          </button>
-
           <button type="button" className="yi-btn danger-outline" onClick={handleClearAll}>
             Clear Data
           </button>
@@ -533,33 +528,15 @@ export default function YesterdayIncoming() {
             ))}
           </select>
 
-          <input
-            type="date"
-            className="yi-input"
-            value={fromDate}
-            title="From date"
-            onChange={(e) => setFromDate(e.target.value)}
-            style={{ width: '130px' }}
-          />
+          <DateNavigator value={selectedDate} onChange={setSelectedDate} />
 
-          <input
-            type="date"
-            className="yi-input"
-            value={toDate}
-            title="To date"
-            onChange={(e) => setToDate(e.target.value)}
-            style={{ width: '130px' }}
-          />
-
-          {(searchQ || filterItem || fromDate || toDate) && (
+          {(searchQ || filterItem) && (
             <button
               type="button"
               className="yi-btn sm"
               onClick={() => {
                 setSearchQ('');
                 setFilterItem('');
-                setFromDate('');
-                setToDate('');
               }}
             >
               Reset
@@ -668,7 +645,7 @@ export default function YesterdayIncoming() {
               {filteredRows.length === 0 ? (
                 <tr>
                   <td colSpan={15} className="yi-empty-state">
-                    Koi data nahi mila. '+ New Entry' ya 'Excel Upload' se records add karein.
+                    No records found. Click '+ New Entry' or upload a file to begin.
                   </td>
                 </tr>
               ) : (

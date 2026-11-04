@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import DateNavigator from '../components/DateNavigator';
 import './NormalMaterialPurchase.css';
 
 function num(s) {
@@ -850,7 +851,7 @@ export default function NormalMaterialPurchase() {
             onClick={() => {
               if (window.confirm('Saara purchase data hata dein?')) {
                 updateState({ ...purchaseState, blocks: [] });
-                showMsg('Saara data hata diya gaya.');
+                showMsg('Clear All Data');
               }
             }}
           >
@@ -859,6 +860,11 @@ export default function NormalMaterialPurchase() {
         </div>
 
         <div className="nmp-toolbar-left">
+          <DateNavigator
+            value={purchaseState.date || new Date().toISOString().slice(0, 10)}
+            onChange={(d) => updateState({ ...purchaseState, date: d, asOn: d })}
+          />
+
           <div className="nmp-search-box">
             <span className="nmp-search-icon">🔍</span>
             <input
@@ -1095,7 +1101,7 @@ export default function NormalMaterialPurchase() {
               ) : (
                 <tr>
                   <td colSpan={12} style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
-                    Koi data nahi mila. "+ New Entry" ya Excel upload se shuru karein.
+                    No records found. Click "+ New Entry" or upload a file to begin.
                   </td>
                 </tr>
               )}
@@ -1109,7 +1115,7 @@ export default function NormalMaterialPurchase() {
         <div className="nmp-modal-backdrop" onClick={() => setIsModalOpen(false)}>
           <div className="nmp-modal-box" onClick={(e) => e.stopPropagation()} role="dialog">
             <div className="nmp-modal-hd">
-              <span>{curCoord.r >= 0 ? '✏️ Row Update Karein' : '➕ Nayi Row Entry Add Karein'}</span>
+              <span>{curCoord.r >= 0 ? '✏️ Row Update Karein' : '➕ Add New Entry'}</span>
               <button
                 type="button"
                 className="nmp-modal-close"
@@ -1122,7 +1128,7 @@ export default function NormalMaterialPurchase() {
             <div className="nmp-modal-bd">
               <div className="nmp-grid">
                 <div className="w2">
-                  <label htmlFor="f_blk">Kis Block Me</label>
+                  <label htmlFor="f_blk">Block</label>
                   <select
                     id="f_blk"
                     value={formFields.blk}

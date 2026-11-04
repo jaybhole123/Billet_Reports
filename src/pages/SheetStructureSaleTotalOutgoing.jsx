@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import DateNavigator from '../components/DateNavigator';
 import './SheetStructureSaleTotalOutgoing.css';
 
 const DEF_COLS = [
@@ -53,9 +54,65 @@ export default function SheetStructureSaleTotalOutgoing() {
   const [sheetNames, setSheetNames] = useState([]);
   const [selectedSheetIndex, setSelectedSheetIndex] = useState(0);
 
-  const [cols, setCols] = useState([]);
-  const [types, setTypes] = useState([]);
-  const [rows, setRows] = useState([]);
+  const [cols, setCols] = useState(() => {
+    try {
+      const stored = localStorage.getItem('etl_table');
+      if (stored) {
+        const t = JSON.parse(stored);
+        if (t && t.cols && t.cols.length) return t.cols;
+      }
+    } catch {}
+    return DEF_COLS;
+  });
+
+  const [types, setTypes] = useState(() => {
+    try {
+      const stored = localStorage.getItem('etl_table');
+      if (stored) {
+        const t = JSON.parse(stored);
+        if (t && t.types && t.types.length) return t.types;
+      }
+    } catch {}
+    return DEF_TYPES;
+  });
+
+  const [rows, setRows] = useState(() => {
+    try {
+      const stored = localStorage.getItem('etl_table');
+      if (stored) {
+        const t = JSON.parse(stored);
+        if (t && t.rows) {
+          return t.rows.map((r) =>
+            r.map((v) => (v && typeof v === 'object' && v.d ? fromYmd(v.d) : v))
+          );
+        }
+      }
+    } catch {}
+    return [];
+  });
+
+  const [rowMetaDates, setRowMetaDates] = useState(() => {
+    try {
+      const stored = localStorage.getItem('etl_table');
+      if (stored) {
+        const t = JSON.parse(stored);
+        if (t && t.rowMetaDates) return t.rowMetaDates;
+        if (t && t.rows) return new Array(t.rows.length).fill(t.uploadDate || new Date().toISOString().slice(0, 10));
+      }
+    } catch {}
+    return [];
+  });
+
+  const [selectedDate, setSelectedDate] = useState(() => {
+    try {
+      const stored = localStorage.getItem('etl_table');
+      if (stored) {
+        const t = JSON.parse(stored);
+        if (t && t.uploadDate) return t.uploadDate;
+      }
+    } catch {}
+    return new Date().toISOString().slice(0, 10);
+  });
 
   const [sortC, setSortC] = useState(-1);
   const [sortD, setSortD] = useState(1);
@@ -64,7 +121,7 @@ export default function SheetStructureSaleTotalOutgoing() {
 
   const [message, setMessage] = useState({ text: '', type: '' });
   const [isDragOver, setIsDragOver] = useState(false);
-  const [isAppVisible, setIsAppVisible] = useState(false);
+  const [isAppVisible, setIsAppVisible] = useState(true);
 
   // Modal / Form state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -111,6 +168,11 @@ export default function SheetStructureSaleTotalOutgoing() {
             r.map((v) => (v && typeof v === 'object' && v.d ? fromYmd(v.d) : v))
           );
           setRows(restoredRows);
+          const restoredDates = t.rowMetaDates || new Array(restoredRows.length).fill(t.uploadDate || new Date().toISOString().slice(0, 10));
+          setRowMetaDates(restoredDates);
+          if (t.uploadDate) {
+            setSelectedDate(t.uploadDate);
+          }
           setSheetNames(['Saved data']);
           setIsAppVisible(true);
           showMsg(`Pichla saved data wapas aaya (${restoredRows.length} rows).`);
@@ -121,13 +183,15 @@ export default function SheetStructureSaleTotalOutgoing() {
     }
   }, []);
 
-  const persistData = (newCols, newTypes, newRows) => {
+  const persistData = (newCols, newTypes, newRows, newMetaDates = rowMetaDates, uploadDate = selectedDate) => {
     try {
       localStorage.setItem(
         'etl_table',
         JSON.stringify({
           cols: newCols,
           types: newTypes,
+          uploadDate: uploadDate || new Date().toISOString().slice(0, 10),
+          rowMetaDates: newMetaDates,
           rows: newRows.map((r) =>
             r.map((v) => (v instanceof Date ? { d: ymd(v) } : v))
           ),
@@ -191,7 +255,11 @@ export default function SheetStructureSaleTotalOutgoing() {
     setColFilter({});
     setSearchQ('');
     setIsAppVisible(true);
-    persistData(newCols, newTypes, newRows);
+    const todayYmd = new Date().toISOString().slice(0, 10);
+    const newDates = new Array(newRows.length).fill(todayYmd);
+    setRowMetaDates(newDates);
+    setSelectedDate(todayYmd);
+    persistData(newCols, newTypes, newRows, newDates, todayYmd);
   };
 
   const handlePickFile = (file) => {
@@ -301,7 +369,14 @@ export default function SheetStructureSaleTotalOutgoing() {
 
   const viewRows = useMemo(() => {
     const q = searchQ.trim().toLowerCase();
-    let res = rows.filter((r) => {
+
+    let res = rows.filter((r, origIdx) => {
+      // Filter strictly by the submission/upload date of the record
+      const uploadSubmittedDate = rowMetaDates[origIdx] || selectedDate;
+      if (selectedDate && uploadSubmittedDate !== selectedDate) {
+        return false;
+      }
+
       for (const c in colFilter) {
         if (colFilter[c] !== '' && String(r[c]) !== colFilter[c]) {
           return false;
@@ -325,7 +400,7 @@ export default function SheetStructureSaleTotalOutgoing() {
     }
 
     return res;
-  }, [rows, colFilter, searchQ, sortC, sortD, types]);
+  }, [rows, rowMetaDates, colFilter, searchQ, sortC, sortD, types, selectedDate]);
 
   const filterOptions = useMemo(() => {
     const opts = {};
@@ -535,15 +610,20 @@ export default function SheetStructureSaleTotalOutgoing() {
     }
 
     let nextRows;
+    let nextDates;
     if (editIdx >= 0) {
       nextRows = [...rows];
       nextRows[editIdx] = out;
+      nextDates = [...rowMetaDates];
+      nextDates[editIdx] = selectedDate;
     } else {
       nextRows = [out, ...rows];
+      nextDates = [selectedDate, ...rowMetaDates];
     }
 
     setRows(nextRows);
-    persistData(cols, types, nextRows);
+    setRowMetaDates(nextDates);
+    persistData(cols, types, nextRows, nextDates);
     showMsg(editIdx >= 0 ? 'Row safalta-poorvak update ho gayi.' : `New Entry add ho gayi (${nextRows.length} rows).`);
     return true;
   };
@@ -580,124 +660,12 @@ export default function SheetStructureSaleTotalOutgoing() {
           <h2>Sheet Structure Sale Total Billate Outgoing</h2>
           <p>Sales orders, dispatch status aur balance overview report</p>
         </div>
+        <DateNavigator value={selectedDate} onChange={setSelectedDate} />
       </div>
-
-      {/* Dual Dropzone Cards (Excel & Image) */}
-      <div className="plant-dropzone-grid">
-        <div
-          className={`plant-drop-card ${isDragOver ? 'over' : ''}`}
-          onClick={() => fileInputRef.current && fileInputRef.current.click()}
-        >
-          <div className="plant-drop-icon">📁</div>
-          <div className="plant-drop-title">Excel ya CSV file upload karein</div>
-          <div className="plant-drop-subtitle">Click karein ya yahan drag &amp; drop karein (.xlsx, .xls, .csv)</div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".xlsx,.xls,.xlsm,.csv"
-            style={{ display: 'none' }}
-            onChange={(e) => {
-              if (e.target.files && e.target.files[0]) {
-                handlePickFile(e.target.files[0]);
-              }
-            }}
-          />
-        </div>
-
-        <div
-          className="plant-drop-card image-card"
-          onClick={() => imageInputRef.current && imageInputRef.current.click()}
-        >
-          <div className="plant-drop-icon">🖼️</div>
-          <div className="plant-drop-title">Reference Image Upload karein</div>
-          <div className="plant-drop-subtitle">Image drag &amp; drop karein ya clipboard se paste karein (Ctrl + V)</div>
-          <input
-            ref={imageInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={(e) => {
-              if (e.target.files && e.target.files[0]) {
-                handlePickImage(e.target.files[0]);
-                e.target.value = '';
-              }
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Upload Actions Bar */}
-      <div className="upload-card-wrapper" style={{ padding: '12px 18px', marginBottom: '8px' }}>
-        <div className="upload-actions-bar" style={{ margin: 0, padding: 0, border: 'none' }}>
-          <div className="manual-start-group">
-            <button
-              type="button"
-              className="btn-action btn-primary"
-              onClick={handleManualStart}
-            >
-              ✍️ Bina file ke manual entry se shuru karein
-            </button>
-            <span className="helper-badge-text">
-              (Standard plant format ke saath empty table load hoga)
-            </span>
-          </div>
-
-          {message.text && (
-            <div className={`status-badge ${message.type === 'err' ? 'err' : ''}`}>
-              <span>{message.type === 'err' ? '⚠️' : '✓'}</span>
-              <span>{message.text}</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Reference Image Preview Box */}
-      {uploadedImageSrc && (
-        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <span style={{ fontWeight: 600, fontSize: '14px', color: '#1e293b' }}>
-              🖼️ Uploaded Reference Image
-            </span>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <button
-                type="button"
-                className="btn-action"
-                style={{ padding: '4px 10px', fontSize: '12px' }}
-                onClick={() => setImageZoom((z) => Math.min(z + 0.25, 3))}
-              >
-                ＋ Zoom In
-              </button>
-              <button
-                type="button"
-                className="btn-action"
-                style={{ padding: '4px 10px', fontSize: '12px' }}
-                onClick={() => setImageZoom((z) => Math.max(z - 0.25, 0.5))}
-              >
-                － Zoom Out
-              </button>
-              <button
-                type="button"
-                className="btn-action"
-                style={{ padding: '4px 10px', fontSize: '12px', color: '#dc2626', borderColor: '#fca5a5' }}
-                onClick={() => setUploadedImageSrc(null)}
-              >
-                ✖ Close Image
-              </button>
-            </div>
-          </div>
-          <div style={{ maxHeight: '420px', overflow: 'auto', background: '#f8fafc', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
-            <img
-              src={uploadedImageSrc}
-              alt="Reference document"
-              style={{ width: `${imageZoom * 100}%`, maxWidth: 'none', borderRadius: '6px', border: '1px solid #cbd5e1' }}
-            />
-          </div>
-        </div>
-      )}
 
       {isAppVisible && (
         <>
-          {/* Summary KPI Metric Cards */}
+          {/* Summary KPI Metric Cards (Upper) */}
           <div className="kpi-cards-grid">
             <div className="kpi-card highlight">
               <div className="kpi-label">Kul Rows</div>
@@ -718,6 +686,94 @@ export default function SheetStructureSaleTotalOutgoing() {
             })}
           </div>
 
+          {/* Dual Dropzone Cards (Excel & Image) - Below KPI Cards */}
+          <div className="plant-dropzone-grid">
+            <div
+              className={`plant-drop-card ${isDragOver ? 'over' : ''}`}
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+            >
+              <div className="plant-drop-icon">📁</div>
+              <div className="plant-drop-title">Excel ya CSV file upload karein</div>
+              <div className="plant-drop-subtitle">Click karein ya yahan drag &amp; drop karein (.xlsx, .xls, .csv)</div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx,.xls,.xlsm,.csv"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    handlePickFile(e.target.files[0]);
+                  }
+                }}
+              />
+            </div>
+
+            <div
+              className="plant-drop-card image-card"
+              onClick={() => imageInputRef.current && imageInputRef.current.click()}
+            >
+              <div className="plant-drop-icon">🖼️</div>
+              <div className="plant-drop-title">Reference Image Upload karein</div>
+              <div className="plant-drop-subtitle">Image drag &amp; drop karein ya clipboard se paste karein (Ctrl + V)</div>
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    handlePickImage(e.target.files[0]);
+                    e.target.value = '';
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Reference Image Preview Box */}
+          {uploadedImageSrc && (
+            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <span style={{ fontWeight: 600, fontSize: '14px', color: '#1e293b' }}>
+                  🖼️ Uploaded Reference Image
+                </span>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    className="btn-action"
+                    style={{ padding: '4px 10px', fontSize: '12px' }}
+                    onClick={() => setImageZoom((z) => Math.min(z + 0.25, 3))}
+                  >
+                    ＋ Zoom In
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-action"
+                    style={{ padding: '4px 10px', fontSize: '12px' }}
+                    onClick={() => setImageZoom((z) => Math.max(z - 0.25, 0.5))}
+                  >
+                    － Zoom Out
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-action"
+                    style={{ padding: '4px 10px', fontSize: '12px', color: '#dc2626', borderColor: '#fca5a5' }}
+                    onClick={() => setUploadedImageSrc(null)}
+                  >
+                    ✖ Close Image
+                  </button>
+                </div>
+              </div>
+              <div style={{ maxHeight: '420px', overflow: 'auto', background: '#f8fafc', padding: '12px', borderRadius: '8px', textAlign: 'center' }}>
+                <img
+                  src={uploadedImageSrc}
+                  alt="Reference document"
+                  style={{ width: `${imageZoom * 100}%`, maxWidth: 'none', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Filter & Operations Toolbar in a Single Clean Line */}
           <div className="toolbar-container">
             <div className="toolbar-row">
@@ -728,27 +784,6 @@ export default function SheetStructureSaleTotalOutgoing() {
                   onClick={() => openFormModal(-1)}
                 >
                   + New Entry
-                </button>
-                <button
-                  type="button"
-                  className="btn-action"
-                  onClick={handleExportXLS}
-                >
-                  Export Excel
-                </button>
-                <button
-                  type="button"
-                  className="btn-action"
-                  onClick={handleExportCSV}
-                >
-                  Export CSV
-                </button>
-                <button
-                  type="button"
-                  className="btn-action"
-                  onClick={handleResetFilters}
-                >
-                  Reset Filter
                 </button>
                 <button
                   type="button"
@@ -887,8 +922,8 @@ export default function SheetStructureSaleTotalOutgoing() {
                       <td colSpan={cols.length + 2}>
                         <div className="empty-state-card">
                           <div className="empty-state-icon">📋</div>
-                          <div>Koi records nahi mile.</div>
-                          <small>New Entry karein ya Excel file upload karein.</small>
+                          <div>No records found.</div>
+                          <small>Add a New Entry or upload an Excel file to get started.</small>
                         </div>
                       </td>
                     </tr>

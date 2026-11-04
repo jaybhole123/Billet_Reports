@@ -11,117 +11,143 @@
   color: #000000;
 }
 
-/* Action Toolbar above the report */
+/* Action Toolbar above the report - Executive Warm Orange System Theme */
 .mis-top-toolbar {
   width: 100%;
   max-width: 900px;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 10px 16px;
+  background: linear-gradient(135deg, #7c2d12 0%, #9a3412 45%, #c2410c 100%);
+  border: 1px solid rgba(254, 215, 170, 0.25);
+  border-radius: 12px;
+  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  gap: 14px;
+  box-shadow: 0 10px 25px -5px rgba(124, 45, 18, 0.45), 0 2px 6px rgba(0, 0, 0, 0.15);
+  position: relative;
 }
 
 .mis-toolbar-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .mis-toolbar-badge {
-  background: #0d47a1;
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
   color: #ffffff;
   font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 4px;
-  letter-spacing: 0.05em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.06em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .mis-toolbar-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
-  color: #0f172a;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .mis-toolbar-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .mis-date-picker-wrap {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 8px;
+  font-size: 12.5px;
   font-weight: 700;
-  color: #334155;
+  color: #ffedd5;
 }
 
 .mis-date-picker-wrap input {
-  height: 28px;
-  padding: 0 8px;
-  border: 1px solid #94a3b8;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #0f172a;
-  background: #ffffff;
+  height: 34px;
+  padding: 0 10px;
+  border: 1.5px solid rgba(254, 215, 170, 0.35);
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(67, 20, 7, 0.55);
   outline: none;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.mis-date-picker-wrap input:focus {
+  border-color: #fdba74;
+  box-shadow: 0 0 0 3px rgba(253, 186, 116, 0.35);
+  background: rgba(67, 20, 7, 0.85);
+}
+
+.mis-date-picker-wrap input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
 }
 
 .mis-btn {
-  height: 28px;
-  padding: 0 12px;
-  border-radius: 4px;
-  font-size: 12px;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  transition: all 0.15s ease;
+  gap: 7px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
 }
 
 /* Edit Mode Toggle Buttons */
 .mis-btn-edit-inactive {
-  background: #f8fafc;
-  color: #0284c7;
-  border: 1.5px solid #0284c7;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(4px);
 }
 
 .mis-btn-edit-inactive:hover {
-  background: #e0f2fe;
+  background: rgba(255, 255, 255, 0.25);
+  border-color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .mis-btn-edit-active {
-  background: #ea580c;
-  color: #ffffff;
-  border: 1.5px solid #c2410c;
-  box-shadow: 0 2px 4px rgba(234, 88, 12, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #ffedd5 100%);
+  color: #9a3412;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 .mis-btn-edit-active:hover {
-  background: #c2410c;
+  background: #ffffff;
+  transform: translateY(-1px);
 }
 
 .mis-btn-pdf {
-  background: #dc2626;
+  background: linear-gradient(135deg, #ea580c 0%, #b43403 100%);
   color: #ffffff;
-  border: 1px solid #b91c1c;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 14px rgba(180, 52, 3, 0.4);
 }
 
 .mis-btn-pdf:hover {
-  background: #b91c1c;
+  background: linear-gradient(135deg, #f97316 0%, #c2410c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.5);
 }
 
 .mis-btn-primary {

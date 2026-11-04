@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import DateNavigator from '../components/DateNavigator';
 import './HeavyMillStockJindal.css';
 
 // Column configurations specific to Jindal Heavy Mill
@@ -50,9 +51,7 @@ export default function HeavyMillStockJindal() {
   });
 
   const [dateStr, setDateStr] = useState(() => {
-    const d = new Date();
-    const p = (n) => ('0' + n).slice(-2);
-    return `${p(d.getDate())}-${p(d.getMonth() + 1)}-${d.getFullYear()}`;
+    return new Date().toISOString().slice(0, 10);
   });
 
   const [searchQ, setSearchQ] = useState('');
@@ -148,6 +147,7 @@ export default function HeavyMillStockJindal() {
       cat: formFields.cat,
       v: cleanV,
       rem: formFields.rem.trim(),
+      date: dateStr,
     };
 
     if (editId) {
@@ -215,6 +215,7 @@ export default function HeavyMillStockJindal() {
             cat: CATS.find((c) => norm(c) === norm(g.category || '')) || guessCat(String(sec)),
             v,
             rem: g.remark || '',
+            date: dateStr,
           });
         });
 
@@ -271,6 +272,7 @@ export default function HeavyMillStockJindal() {
     const q = searchQ.trim().toLowerCase();
     const rows = data
       .filter((r) => {
+        if (dateStr && r.date && r.date !== dateStr) return false;
         if (filterCat && r.cat !== filterCat) return false;
         if (q && !r.sec.toLowerCase().includes(q) && !(r.rem || '').toLowerCase().includes(q)) return false;
         return true;
@@ -458,10 +460,6 @@ export default function HeavyMillStockJindal() {
             + New Entry
           </button>
 
-          <button type="button" className="jnd-btn" onClick={handleExportExcel}>
-            📤 Export Excel
-          </button>
-
           <button type="button" className="jnd-btn danger-outline" onClick={handleClearAll}>
             Clear Data
           </button>
@@ -491,16 +489,7 @@ export default function HeavyMillStockJindal() {
             ))}
           </select>
 
-          <div className="jnd-date-box">
-            <span>Date:</span>
-            <input
-              type="text"
-              value={dateStr}
-              onChange={(e) => setDateStr(e.target.value)}
-              placeholder="DD-MM-YYYY"
-              style={{ width: '105px' }}
-            />
-          </div>
+          <DateNavigator value={dateStr} onChange={setDateStr} />
         </div>
       </div>
 
@@ -601,7 +590,9 @@ export default function HeavyMillStockJindal() {
               {filteredRows.length === 0 ? (
                 <tr>
                   <td colSpan={COLS.length + 5} className="jnd-empty-state">
-                    No data found. Start with '+ New Entry' or 'Excel Upload'.
+                    <div className="jnd-empty-state-content">
+                      No data found. Start with '+ New Entry' or 'Excel Upload'.
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -745,7 +736,7 @@ export default function HeavyMillStockJindal() {
                   </div>
                 </div>
 
-                <div className="jnd-subheading">📏 Length-Wise Quantities [MT]</div>
+                <div className="jnd-subheading">📏 Length Quantities [MT]</div>
                 <div className="jnd-grid-lengths">
                   {COLS.map((c) => (
                     <div key={c[1]}>

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import DateNavigator from '../components/DateNavigator';
 import './TotalOutgoing.css';
 
 const fd = (d) => {
@@ -387,6 +388,7 @@ export default function TotalOutgoing() {
   const filteredData = useMemo(() => {
     const q = search.trim().toLowerCase();
     return data.filter((r) => {
+      if (reportDate && r.date && r.date !== reportDate) return false;
       if (selectedGroup && r.grp !== selectedGroup) return false;
       if (selectedParty && r.party !== selectedParty) return false;
       if (q) {
@@ -395,7 +397,7 @@ export default function TotalOutgoing() {
       }
       return true;
     });
-  }, [data, search, selectedGroup, selectedParty]);
+  }, [data, search, selectedGroup, selectedParty, reportDate]);
 
   // Groups present in filtered data
   const distinctGroups = useMemo(() => {
@@ -522,14 +524,7 @@ export default function TotalOutgoing() {
         </div>
 
         <div className="sp-header-actions">
-          <div className="sp-date-badge">
-            <span>📅 Report Date</span>
-            <input
-              type="date"
-              value={reportDate}
-              onChange={(e) => setReportDate(e.target.value)}
-            />
-          </div>
+          <DateNavigator value={reportDate} onChange={setReportDate} />
 
           <button className="sp-btn" onClick={handleCarryForward} title="Balance ko agle din ka Prv. Pending bana deta hai">
             ⏭ Carry Forward
@@ -537,10 +532,6 @@ export default function TotalOutgoing() {
 
           <button className="sp-btn sp-btn-primary pri" onClick={handleOpenAdd}>
             ＋ New Entry
-          </button>
-
-          <button className="sp-btn" onClick={handleExport} title="Export current register to Excel">
-            📤 Export Excel
           </button>
 
           <button className="sp-btn" onClick={handleDownloadTemplate} title="Download Excel template">

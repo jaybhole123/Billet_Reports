@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import DateNavigator from '../components/DateNavigator';
 import './HeavyMillFinishStockKamDhenu.css';
 
 // Length columns definition
@@ -62,9 +63,7 @@ export default function HeavyMillFinishStockKamDhenu() {
   });
 
   const [dateStr, setDateStr] = useState(() => {
-    const d = new Date();
-    const p = (n) => ('0' + n).slice(-2);
-    return `${p(d.getDate())}-${p(d.getMonth() + 1)}-${d.getFullYear()}`;
+    return new Date().toISOString().slice(0, 10);
   });
 
   const [searchQ, setSearchQ] = useState('');
@@ -160,6 +159,7 @@ export default function HeavyMillFinishStockKamDhenu() {
       cat: formFields.cat,
       v: cleanV,
       rem: formFields.rem.trim(),
+      date: dateStr,
     };
 
     if (editId) {
@@ -227,6 +227,7 @@ export default function HeavyMillFinishStockKamDhenu() {
             cat: CATS.find((c) => norm(c) === norm(g.category || '')) || guessCat(String(sec)),
             v,
             rem: g.remark || '',
+            date: dateStr,
           });
         });
 
@@ -283,6 +284,7 @@ export default function HeavyMillFinishStockKamDhenu() {
     const q = searchQ.trim().toLowerCase();
     const rows = data
       .filter((r) => {
+        if (dateStr && r.date && r.date !== dateStr) return false;
         if (filterCat && r.cat !== filterCat) return false;
         if (q && !r.sec.toLowerCase().includes(q) && !(r.rem || '').toLowerCase().includes(q)) return false;
         return true;
@@ -471,10 +473,6 @@ export default function HeavyMillFinishStockKamDhenu() {
             + New Entry
           </button>
 
-          <button type="button" className="hm-btn" onClick={handleExportExcel}>
-            📤 Export Excel
-          </button>
-
           <button type="button" className="hm-btn danger-outline" onClick={handleClearAll}>
             Clear Data
           </button>
@@ -504,16 +502,7 @@ export default function HeavyMillFinishStockKamDhenu() {
             ))}
           </select>
 
-          <div className="hm-date-box">
-            <span>Date:</span>
-            <input
-              type="text"
-              value={dateStr}
-              onChange={(e) => setDateStr(e.target.value)}
-              placeholder="DD-MM-YYYY"
-              style={{ width: '105px' }}
-            />
-          </div>
+          <DateNavigator value={dateStr} onChange={setDateStr} />
         </div>
       </div>
 
@@ -614,7 +603,9 @@ export default function HeavyMillFinishStockKamDhenu() {
               {filteredRows.length === 0 ? (
                 <tr>
                   <td colSpan={COLS.length + 5} className="hm-empty-state">
-                    Koi data nahi mila. '+ Nayi Entry' ya 'Excel Upload' se shuru karein.
+                    <div className="hm-empty-state-content">
+                      No records found. Click '+ New Entry' or upload a file to begin.
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -758,7 +749,7 @@ export default function HeavyMillFinishStockKamDhenu() {
                   </div>
                 </div>
 
-                <div className="hm-subheading">📏 Length-Wise Quantities [MT]</div>
+                <div className="hm-subheading">📏 Length Quantities [MT]</div>
                 <div className="hm-grid-lengths">
                   {COLS.map((c) => (
                     <div key={c[1]}>

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
+import DateNavigator from '../components/DateNavigator';
 import './HeavyStructureProduction.css';
 
 const RAW_GROUPS = [
@@ -474,9 +475,22 @@ export default function HeavyStructureProduction() {
         </div>
       )}
       {/* Top Page Header */}
-      <div className="hsp-page-header">
-        <h2>Heavy Structure Mill — Production Report</h2>
-        <p>Comprehensive shift-wise raw material charging, finished section output &amp; loss analysis</p>
+      <div className="hsp-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2>Heavy Structure Mill — Production Report</h2>
+          <p>Comprehensive shift-wise raw material charging, finished section output &amp; loss analysis</p>
+        </div>
+        <DateNavigator
+          value={currentReport?.date || new Date().toISOString().slice(0, 10)}
+          onChange={(d) => {
+            const match = reports.find((r) => r.date === d);
+            if (match) {
+              setCurId(match.id);
+            } else if (currentReport) {
+              updateCurrentReport({ date: d });
+            }
+          }}
+        />
       </div>
 
       {/* KPI Metrics Cards in Single Row */}
@@ -560,16 +574,7 @@ export default function HeavyStructureProduction() {
       {/* Single-Row Clean Executive Toolbar */}
       <div className="hsp-toolbar-card">
         <div className="hsp-toolbar-left">
-          <button type="button" className="hsp-btn pri" onClick={() => openForm('raw')}>
-            + Raw Entry
-          </button>
-          <button type="button" className="hsp-btn pri" onClick={() => openForm('fin')}>
-            + Finished Entry
-          </button>
-
-          <button type="button" className="hsp-btn" onClick={handleExportExcel}>
-            📤 Export Excel
-          </button>
+          <span style={{ fontSize: '14px', fontWeight: 700, color: '#334155' }}>Shift Report Controls</span>
         </div>
 
         <div className="hsp-toolbar-right">

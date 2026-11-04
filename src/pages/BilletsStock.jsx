@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import DateNavigator from '../components/DateNavigator';
 import './BilletsStock.css';
 
 function num(s) {
@@ -1124,15 +1125,10 @@ export default function BilletsStock() {
             <span className="blt-table-heading">BILLETS STOCK - LSM And MSM</span>
           </div>
 
-          <div className="blt-batch-date-box">
-            <span>Date / Batch:</span>
-            <input
-              id="blt-date"
-              value={stockState.date || ''}
-              onChange={(e) => updateState({ ...stockState, date: e.target.value })}
-              placeholder="DD-MM-YYYY"
-            />
-          </div>
+          <DateNavigator
+            value={stockState.date || new Date().toISOString().slice(0, 10)}
+            onChange={(d) => updateState({ ...stockState, date: d })}
+          />
         </div>
 
         <div
@@ -1298,7 +1294,7 @@ export default function BilletsStock() {
               ) : (
                 <tr>
                   <td colSpan={14} style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
-                    Koi data nahi mila. "+ New Entry", Excel ya Image upload se shuru karein.
+                    No records found. Click "+ New Entry" or upload a file to begin.
                   </td>
                 </tr>
               )}
@@ -1332,7 +1328,7 @@ export default function BilletsStock() {
         <div className="blt-modal-backdrop" onClick={() => setIsModalOpen(false)}>
           <div className="blt-modal-card" onClick={(e) => e.stopPropagation()} role="dialog">
             <div className="modal-hd">
-              <span>{curCoord.r >= 0 ? '✏️ Row Update Karein' : '➕ Nayi Row Entry Add Karein'}</span>
+              <span>{curCoord.r >= 0 ? '✏️ Row Update Karein' : '➕ Add New Entry'}</span>
               <button
                 type="button"
                 className="modal-close"
@@ -1374,7 +1370,7 @@ export default function BilletsStock() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="f_blk">Kis Block Me</label>
+                  <label htmlFor="f_blk">Block</label>
                   <select
                     id="f_blk"
                     value={formFields.blk}

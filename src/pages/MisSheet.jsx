@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import DateNavigator from '../components/DateNavigator';
 import './MisSheet.css';
 
 const f3 = (n) => (+n || 0).toFixed(3);
@@ -185,6 +186,7 @@ export default function MisSheet() {
   const billetStockRows = useMemo(() => {
     const map = {};
     if (sources.billetsStock?.blocks) {
+      if (sources.billetsStock.date && !isDateMatch(sources.billetsStock.date, reportDate)) return [];
       sources.billetsStock.blocks.forEach((blk) => {
         (blk.rows || []).forEach((r) => {
           let sz = String(r.size || '').trim().toUpperCase();
@@ -200,7 +202,7 @@ export default function MisSheet() {
       defaultDesc: size,
       auto: autoVal,
     }));
-  }, [sources.billetsStock]);
+  }, [sources.billetsStock, reportDate]);
 
   const totalBilletStock = useMemo(() => {
     return billetStockRows.reduce((acc, itm) => acc + getVal(itm.key, itm.auto), 0);
@@ -212,6 +214,7 @@ export default function MisSheet() {
   const billetIncomingRows = useMemo(() => {
     const map = {};
     if (sources.nmp?.blocks) {
+      if (sources.nmp.date && !isDateMatch(sources.nmp.date, reportDate)) return [];
       sources.nmp.blocks.forEach((blk) => {
         (blk.rows || []).forEach((r) => {
           let mat = String(r.mat || blk.label || '').trim().toUpperCase();
@@ -228,7 +231,7 @@ export default function MisSheet() {
       defaultDesc: size,
       auto: autoVal,
     }));
-  }, [sources.nmp]);
+  }, [sources.nmp, reportDate]);
 
   const totalBilletIncoming = useMemo(() => {
     return billetIncomingRows.reduce((acc, itm) => acc + getVal(itm.key, itm.auto), 0);
@@ -245,6 +248,7 @@ export default function MisSheet() {
   const computedStructureStockLight = useMemo(() => {
     let tot = 0;
     if (sources.lsmFinish?.blocks) {
+      if (sources.lsmFinish.date && !isDateMatch(sources.lsmFinish.date, reportDate)) return 0;
       sources.lsmFinish.blocks.forEach((b) => {
         (b.rows || []).forEach((r) => {
           tot += Object.values(r.v || {}).reduce((a, b) => a + (+b || 0), 0);
@@ -252,40 +256,49 @@ export default function MisSheet() {
       });
     }
     return tot;
-  }, [sources.lsmFinish]);
+  }, [sources.lsmFinish, reportDate]);
 
   // Structure Stock Heavy: KamDhenu + Jindal Stock
   const computedStructureStockHeavy = useMemo(() => {
     let tot = 0;
     (sources.kamdhenu || []).forEach((r) => {
+      if (r.date && !isDateMatch(r.date, reportDate)) return;
       tot += Object.values(r.v || {}).reduce((a, b) => a + (+b || 0), 0);
     });
     (sources.jindal || []).forEach((r) => {
+      if (r.date && !isDateMatch(r.date, reportDate)) return;
       tot += Object.values(r.v || {}).reduce((a, b) => a + (+b || 0), 0);
     });
     return tot;
-  }, [sources.kamdhenu, sources.jindal]);
+  }, [sources.kamdhenu, sources.jindal, reportDate]);
 
   // Sales Order Light: from Sheet Structure Sale Outgoing page
   const computedSalesOrderLight = useMemo(() => {
     if (!sources.sheetSale?.rows || !sources.sheetSale.rows.length) return 0;
+    // Check if sheetSale data matches reportDate (via uploadDate or rowMetaDates)
+    const uploadDate = sources.sheetSale.uploadDate;
+    const metaDates = sources.sheetSale.rowMetaDates || [];
     const cols = sources.sheetSale.cols || [];
     const balIdx = cols.findIndex((c) => /balance\s*qty/i.test(c));
     const idx = balIdx >= 0 ? balIdx : 10;
-    return sources.sheetSale.rows.reduce((acc, r) => {
+
+    return sources.sheetSale.rows.reduce((acc, r, rIdx) => {
+      const rowDate = metaDates[rIdx] || uploadDate;
+      if (rowDate && !isDateMatch(rowDate, reportDate)) return acc;
       const v = parseFloat(r[idx]) || 0;
       return acc + (v > 0 ? v : 0);
     }, 0);
-  }, [sources.sheetSale]);
+  }, [sources.sheetSale, reportDate]);
 
   // Sales Order Heavy: from TotalOutgoing (Sauda Reg) page
   const computedSalesOrderHeavy = useMemo(() => {
     const rows = sources.totalOutgoing?.rows || [];
     return rows.reduce((acc, r) => {
+      if (r.date && !isDateMatch(r.date, reportDate)) return acc;
       const bal = (+r.prv || 0) - (+r.db || 0) - (+r.dw || 0);
       return acc + (bal > 0 ? bal : 0);
     }, 0);
-  }, [sources.totalOutgoing]);
+  }, [sources.totalOutgoing, reportDate]);
 
   const structStockLight = getVal('struct_stock_light', computedStructureStockLight);
   const structStockHeavy = getVal('struct_stock_heavy', computedStructureStockHeavy);
@@ -385,6 +398,7 @@ export default function MisSheet() {
     const map = {};
     const rows = sources.totalOutgoing?.rows || [];
     rows.forEach((r) => {
+      if (r.date && !isDateMatch(r.date, reportDate)) return;
       const b = (+r.prv || 0) - (+r.db || 0) - (+r.dw || 0);
       if (b > 0) {
         const desc = String(r.desc || r.sec || r.party || 'PENDING DISPATCH').trim().toUpperCase();
@@ -398,7 +412,7 @@ export default function MisSheet() {
       defaultDesc: label,
       auto: autoVal,
     }));
-  }, [sources.totalOutgoing]);
+  }, [sources.totalOutgoing, reportDate]);
 
   // Helper to add custom row manually
   const [customUserRows, setCustomUserRows] = useState(() => {
@@ -641,14 +655,7 @@ export default function MisSheet() {
           <span className="mis-toolbar-title">HINDUSTAN DHAATU REPORT (BILLET)</span>
         </div>
         <div className="mis-toolbar-actions">
-          <div className="mis-date-picker-wrap">
-            <label>Report Date:</label>
-            <input
-              type="date"
-              value={reportDate}
-              onChange={(e) => setReportDate(e.target.value)}
-            />
-          </div>
+          <DateNavigator value={reportDate} onChange={setReportDate} />
 
           {/* Toggle Edit Mode Button */}
           <button
@@ -673,24 +680,6 @@ export default function MisSheet() {
               <line x1="9" y1="15" x2="15" y2="15" />
             </svg>
             <span>Download PDF</span>
-          </button>
-
-          <button className="mis-btn mis-btn-primary" onClick={handleExportExcel}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            <span>Export Excel</span>
-          </button>
-          <button className="mis-btn mis-btn-outline" onClick={handleClearAllOverrides}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-              <path d="M21 3v5h-5" />
-              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-              <path d="M8 16H3v5" />
-            </svg>
-            <span>Reset</span>
           </button>
         </div>
       </div>

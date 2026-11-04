@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
+import DateNavigator from '../components/DateNavigator';
 import './HeavyLightProduction.css';
 
 const RAW_GROUPS = ['Raw Material', 'Miss Roll', 'Cold Pcs'];
@@ -466,9 +467,22 @@ export default function HeavyLightProduction() {
         </div>
       )}
       {/* Top Page Header */}
-      <div className="lsp-page-header">
-        <h2>Light Structure Mill — Production Report</h2>
-        <p>Light section structural mill shift report · Billet charging, production output &amp; scrap metrics</p>
+      <div className="lsp-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2>Light Structure Mill — Production Report</h2>
+          <p>Light section structural mill shift report · Billet charging, production output &amp; scrap metrics</p>
+        </div>
+        <DateNavigator
+          value={currentReport?.date || new Date().toISOString().slice(0, 10)}
+          onChange={(d) => {
+            const match = reports.find((r) => r.date === d);
+            if (match) {
+              setCurId(match.id);
+            } else if (currentReport) {
+              updateCurrentReport({ date: d });
+            }
+          }}
+        />
       </div>
 
       {/* KPI Metrics Cards in Single Row */}
@@ -552,16 +566,7 @@ export default function HeavyLightProduction() {
       {/* Single-Row Clean Executive Toolbar */}
       <div className="lsp-toolbar-card">
         <div className="lsp-toolbar-left">
-          <button type="button" className="lsp-btn pri" onClick={() => openForm('raw')}>
-            + Raw Entry
-          </button>
-          <button type="button" className="lsp-btn pri" onClick={() => openForm('fin')}>
-            + Finished Entry
-          </button>
-
-          <button type="button" className="lsp-btn" onClick={handleExportExcel}>
-            📤 Export Excel
-          </button>
+          <span style={{ fontSize: '14px', fontWeight: 700, color: '#334155' }}>Shift Report Controls</span>
         </div>
 
         <div className="lsp-toolbar-right">

@@ -412,7 +412,7 @@ body {
 .plant-drop-card {
   border: 2px dashed #cbd5e1;
   border-radius: 12px;
-  padding: 22px 20px;
+  padding: 14px 20px;
   text-align: center;
   background: #f8fafc;
   cursor: pointer;
@@ -421,8 +421,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 105px;
+  gap: 0;
+  min-height: 64px;
   box-sizing: border-box;
 }
 
@@ -485,8 +485,7 @@ body {
 }
 
 .plant-drop-subtitle {
-  font-size: 12.5px;
-  color: #64748b;
+  display: none !important;
 }
 
 /* Universal SVG vector replacements for search and empty states */
@@ -513,4 +512,319 @@ body {
   -webkit-mask-size: contain;
   mask-size: contain;
 }
+
+/* ========================================================================== */
+/* GLOBAL PREMIUM MODAL & FORM STYLING ACROSS ALL PAGES                      */
+/* ========================================================================== */
+
+/* Backdrop */
+.blt-modal-backdrop,
+.nmp-modal-backdrop,
+.lsm-modal-backdrop,
+.hm-modal-backdrop,
+.jnd-modal-backdrop,
+.yo-modal-overlay,
+.to-modal-overlay,
+.modal-overlay {
+  background: rgba(15, 23, 42, 0.65) !important;
+  backdrop-filter: blur(6px) !important;
+  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Modal Containers */
+.blt-modal-card,
+.nmp-modal-box,
+.lsm-modal-box,
+.hm-modal-content,
+.jnd-modal-content,
+.yo-modal,
+.to-modal,
+.etl-modal-content {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+  background: #ffffff !important;
+  animation: modalZoomIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden !important;
+}
+
+/* Modal Headers */
+.blt-modal-card .modal-hd,
+.nmp-modal-hd,
+.lsm-modal-hd,
+.hm-modal-header,
+.jnd-modal-header,
+.yo-modal-header,
+.to-modal-header,
+.etl-modal-header {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  color: #ffffff !important;
+  padding: 16px 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.blt-modal-card .modal-hd span,
+.nmp-modal-hd span,
+.lsm-modal-hd span,
+.hm-modal-header h3,
+.jnd-modal-header h3,
+.yo-modal-header h3,
+.to-modal-header h3,
+.etl-modal-header h3 {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  margin: 0 !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* Modal Close Button */
+.blt-modal-card .modal-close,
+.nmp-modal-close,
+.lsm-modal-close,
+.hm-modal-close,
+.jnd-modal-close,
+.yo-btn-sm,
+.to-btn-close {
+  width: 32px !important;
+  height: 32px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #e2e8f0 !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  font-size: 16px !important;
+}
+
+.blt-modal-card .modal-close:hover,
+.nmp-modal-close:hover,
+.lsm-modal-close:hover,
+.hm-modal-close:hover,
+.jnd-modal-close:hover,
+.yo-btn-sm:hover,
+.to-btn-close:hover {
+  background: rgba(239, 68, 68, 0.25) !important;
+  color: #fca5a5 !important;
+  transform: rotate(90deg);
+}
+
+/* Modal Body */
+.blt-modal-card .modal-bd,
+.nmp-modal-bd,
+.lsm-modal-bd,
+.hm-modal-body,
+.jnd-modal-body,
+.yo-modal-body,
+.to-modal-body,
+.etl-modal-body {
+  padding: 22px 24px !important;
+  background: #f8fafc !important;
+}
+
+/* Professional Input Labels */
+.blt-modal-card label,
+.nmp-modal-bd label,
+.lsm-modal-bd label,
+.hm-modal-body label,
+.jnd-modal-body label,
+.yo-modal-body label,
+.to-modal-body label {
+  display: block !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #334155 !important;
+  letter-spacing: 0.03em !important;
+  margin-bottom: 6px !important;
+  text-transform: capitalize !important;
+}
+
+/* Premium Form Inputs */
+.blt-modal-card input[type="text"],
+.blt-modal-card input[type="number"],
+.blt-modal-card select,
+.nmp-modal-bd input[type="text"],
+.nmp-modal-bd input[type="number"],
+.nmp-modal-bd input[type="date"],
+.nmp-modal-bd select,
+.lsm-modal-bd input[type="text"],
+.lsm-modal-bd input[type="number"],
+.lsm-modal-bd select,
+.hm-modal-body input,
+.hm-modal-body select,
+.jnd-modal-body input,
+.jnd-modal-body select,
+.yo-modal-body input,
+.yo-modal-body select,
+.to-modal-body input,
+.to-modal-body select {
+  height: 40px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  padding: 0 12px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+}
+
+.blt-modal-card input:focus,
+.blt-modal-card select:focus,
+.nmp-modal-bd input:focus,
+.nmp-modal-bd select:focus,
+.lsm-modal-bd input:focus,
+.lsm-modal-bd select:focus,
+.hm-modal-body input:focus,
+.hm-modal-body select:focus,
+.jnd-modal-body input:focus,
+.jnd-modal-body select:focus,
+.yo-modal-body input:focus,
+.yo-modal-body select:focus,
+.to-modal-body input:focus,
+.to-modal-body select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  background: #ffffff !important;
+}
+
+/* Fieldset and Section Boxes inside Modals */
+.blt-modal-card fieldset,
+.lsm-modal-bd fieldset,
+.nb-box {
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  padding: 14px 18px 16px !important;
+  margin: 0 0 16px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+
+.blt-modal-card legend,
+.lsm-modal-bd legend {
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  color: #ea580c !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  padding: 2px 8px !important;
+  background: #fff7ed !important;
+  border: 1px solid #fed7aa !important;
+  border-radius: 4px !important;
+}
+
+/* Modal Footers */
+.blt-modal-card .modal-ft,
+.nmp-modal-ft,
+.lsm-modal-ft,
+.hm-modal-footer,
+.jnd-modal-footer,
+.yo-modal-footer,
+.to-modal-footer {
+  padding: 14px 24px !important;
+  background: #ffffff !important;
+  border-top: 1px solid #e2e8f0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+}
+
+/* Action Buttons inside Modals */
+.blt-modal-card .btn-primary,
+.nmp-modal-ft .nmp-btn.pri,
+.lsm-modal-ft .lsm-btn-primary,
+.yo-modal-footer .yo-btn-primary,
+.to-modal-footer .to-btn-primary {
+  height: 40px !important;
+  padding: 0 22px !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  background: linear-gradient(180deg, #ea580c 0%, #c2410c 100%) !important;
+  border: 1px solid #c2410c !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.3) !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.blt-modal-card .btn-primary:hover,
+.nmp-modal-ft .nmp-btn.pri:hover,
+.lsm-modal-ft .lsm-btn-primary:hover,
+.yo-modal-footer .yo-btn-primary:hover,
+.to-modal-footer .to-btn-primary:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4) !important;
+}
+
+.blt-modal-card .btn-default,
+.nmp-modal-ft .nmp-btn,
+.lsm-modal-ft .lsm-btn-secondary,
+.yo-modal-footer .yo-btn-secondary,
+.to-modal-footer .to-btn-secondary {
+  height: 40px !important;
+  padding: 0 18px !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #334155 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.blt-modal-card .btn-default:hover,
+.nmp-modal-ft .nmp-btn:hover,
+.lsm-modal-ft .lsm-btn-secondary:hover,
+.yo-modal-footer .yo-btn-secondary:hover,
+.to-modal-footer .to-btn-secondary:hover {
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+/* Hide upload instructions and title text across all pages (only icons remain) */
+.plant-drop-title,
+.plant-drop-subtitle,
+.yo-drop-subtitle,
+.to-drop-subtitle,
+.nmp-drop-sub,
+.hm-drop-sub,
+.yo-dropzone-text,
+.to-dropzone-text,
+.nmp-drop-title,
+.hm-drop-title {
+  display: none !important;
+}
+
+
 
