@@ -186,15 +186,19 @@ export default function MisSheet() {
   const billetStockRows = useMemo(() => {
     const map = {};
     if (sources.billetsStock?.blocks) {
-      if (sources.billetsStock.date && !isDateMatch(sources.billetsStock.date, reportDate)) return [];
-      sources.billetsStock.blocks.forEach((blk) => {
-        (blk.rows || []).forEach((r) => {
-          let sz = String(r.size || '').trim().toUpperCase();
-          if (!sz) return;
-          const clQ = parseFloat(r.clQ) || parseFloat(r.tot) || 0;
-          map[sz] = (map[sz] || 0) + clQ;
+      const match = !sources.billetsStock.date || isDateMatch(sources.billetsStock.date, reportDate);
+      if (match) {
+        sources.billetsStock.blocks.forEach((blk) => {
+          (blk.rows || []).forEach((r) => {
+            let sz = String(r.size || '').trim().toUpperCase();
+            if (!sz) return;
+            const clQ = parseFloat(r.clQ) || parseFloat(r.tot) || 0;
+            if (clQ > 0) {
+              map[sz] = (map[sz] || 0) + clQ;
+            }
+          });
         });
-      });
+      }
     }
 
     return Object.entries(map).map(([size, autoVal]) => ({
@@ -205,7 +209,10 @@ export default function MisSheet() {
   }, [sources.billetsStock, reportDate]);
 
   const totalBilletStock = useMemo(() => {
-    return billetStockRows.reduce((acc, itm) => acc + getVal(itm.key, itm.auto), 0);
+    if (billetStockRows.length > 0) {
+      return billetStockRows.reduce((acc, itm) => acc + getVal(itm.key, itm.auto), 0);
+    }
+    return getVal('billets_stock_manual', 0);
   }, [billetStockRows, manualOverrides]);
 
   // =========================================================================
@@ -214,14 +221,15 @@ export default function MisSheet() {
   const billetIncomingRows = useMemo(() => {
     const map = {};
     if (sources.nmp?.blocks) {
-      if (sources.nmp.date && !isDateMatch(sources.nmp.date, reportDate)) return [];
       sources.nmp.blocks.forEach((blk) => {
         (blk.rows || []).forEach((r) => {
           let mat = String(r.mat || blk.label || '').trim().toUpperCase();
           mat = mat.replace(/^MS\.\s*BILLET\s*/i, '').replace(/^BILLET\s*/i, '').replace(/[()]/g, '').trim();
           if (!mat) return;
           const bal = parseFloat(r.bal) || 0;
-          map[mat] = (map[mat] || 0) + bal;
+          if (bal > 0) {
+            map[mat] = (map[mat] || 0) + bal;
+          }
         });
       });
     }
@@ -234,7 +242,10 @@ export default function MisSheet() {
   }, [sources.nmp, reportDate]);
 
   const totalBilletIncoming = useMemo(() => {
-    return billetIncomingRows.reduce((acc, itm) => acc + getVal(itm.key, itm.auto), 0);
+    if (billetIncomingRows.length > 0) {
+      return billetIncomingRows.reduce((acc, itm) => acc + getVal(itm.key, itm.auto), 0);
+    }
+    return getVal('billets_incoming_manual', 0);
   }, [billetIncomingRows, manualOverrides]);
 
   // =========================================================================
@@ -507,15 +518,22 @@ export default function MisSheet() {
     return [...pendingRows, ...extra];
   }, [pendingRows, customUserRows.pend]);
 
-  // Recalculate totals including custom rows
+  // Recalculate totals including custom rows or manual input
   const grandTotalBilletStock = useMemo(() => {
-    return allBilletStockRows.reduce((acc, itm) => acc + getVal(itm.key, itm.auto), 0);
+    if (allBilletStockRows.length > 0) {
+      return allBilletStockRows.reduce((acc, itm) => acc + getVal(itm.key, itm.auto), 0);
+    }
+    return getVal('billets_stock_manual', 0);
   }, [allBilletStockRows, manualOverrides]);
 
   const grandTotalBilletIncoming = useMemo(() => {
-    return allBilletIncomingRows.reduce((acc, itm) => acc + getVal(itm.key, itm.auto), 0);
+    if (allBilletIncomingRows.length > 0) {
+      return allBilletIncomingRows.reduce((acc, itm) => acc + getVal(itm.key, itm.auto), 0);
+    }
+    return getVal('billets_incoming_manual', 0);
   }, [allBilletIncomingRows, manualOverrides]);
 
+  // TOTAL BILLETS STOCK AND INCOMING = BILLETS STOCK (sub total) + BILLETS INCOMING (sub total)
   const grandTotalBilletsStockAndIncoming = grandTotalBilletStock + grandTotalBilletIncoming;
   const grandBurningLoss = grandTotalBilletsStockAndIncoming * 0.06;
   const grandLessAfterBurning = grandTotalBilletsStockAndIncoming - grandBurningLoss;
@@ -720,7 +738,7 @@ export default function MisSheet() {
                 {allBilletStockRows.map((item, idx) => (
                   <tr key={item.key}>
                     {idx === 0 && (
-                      <td className="mis-category-merged-cell" rowSpan={allBilletStockRows.length}>
+                      <td className="mis-category-merged-cell" rowSpan={allBilletStockRows.length + (allBilletStockRows.length > 1 ? 1 : 0)}>
                         BILLETS STOCK
                         {isEditMode && (
                           <button
@@ -773,15 +791,17 @@ export default function MisSheet() {
                     </td>
                   </tr>
                 ))}
-                {/* TOTAL BILLETS STOCK */}
-                <tr className="mis-pdf-subtotal-row">
-                  <td colSpan={2} className="mis-total-label-cell">
-                    TOTAL
-                  </td>
-                  <td className="mis-qty-cell mis-bold-qty">
-                    {f3(grandTotalBilletStock)}
-                  </td>
-                </tr>
+                {/* TOTAL BILLETS STOCK SUB TOTAL (shown when multiple rows) */}
+                {allBilletStockRows.length > 1 && (
+                  <tr className="mis-pdf-subtotal-row">
+                    <td className="mis-total-label-cell">
+                      TOTAL
+                    </td>
+                    <td className="mis-qty-cell mis-bold-qty">
+                      {f3(grandTotalBilletStock)}
+                    </td>
+                  </tr>
+                )}
               </>
             ) : (
               <tr>
@@ -797,10 +817,35 @@ export default function MisSheet() {
                     </button>
                   )}
                 </td>
-                <td className="mis-desc-cell" style={{ color: '#64748b', fontStyle: 'italic', padding: '6px' }}>
-                  No stock records in Billets Stock page
+                <td className="mis-desc-cell">
+                  {isEditMode ? (
+                    <input
+                      type="text"
+                      className="mis-desc-input"
+                      value={getDesc('billets_stock_desc', 'No stock records in Billets Stock page')}
+                      placeholder="Size ya description..."
+                      onChange={(e) => handleDescChange('billets_stock_desc', e.target.value)}
+                    />
+                  ) : (
+                    <span style={{ color: manualOverrides['billets_stock_manual'] ? '#000000' : '#64748b', fontStyle: manualOverrides['billets_stock_manual'] ? 'normal' : 'italic' }}>
+                      {getDesc('billets_stock_desc', 'No stock records in Billets Stock page')}
+                    </span>
+                  )}
                 </td>
-                <td className="mis-qty-cell mis-bold-qty">0.000</td>
+                <td className="mis-qty-cell mis-bold-qty">
+                  {isEditMode ? (
+                    <input
+                      type="number"
+                      step="0.001"
+                      placeholder="0.000"
+                      className="mis-cell-input"
+                      value={manualOverrides['billets_stock_manual'] !== undefined ? manualOverrides['billets_stock_manual'] : ''}
+                      onChange={(e) => handleOverrideChange('billets_stock_manual', e.target.value)}
+                    />
+                  ) : (
+                    <span>{f3(grandTotalBilletStock)}</span>
+                  )}
+                </td>
               </tr>
             )}
 
@@ -812,7 +857,7 @@ export default function MisSheet() {
                 {allBilletIncomingRows.map((item, idx) => (
                   <tr key={item.key}>
                     {idx === 0 && (
-                      <td className="mis-category-merged-cell" rowSpan={allBilletIncomingRows.length}>
+                      <td className="mis-category-merged-cell" rowSpan={allBilletIncomingRows.length + (allBilletIncomingRows.length > 1 ? 1 : 0)}>
                         BILLETS INCOMING
                         {isEditMode && (
                           <button
@@ -865,15 +910,17 @@ export default function MisSheet() {
                     </td>
                   </tr>
                 ))}
-                {/* TOTAL BILLETS INCOMING */}
-                <tr className="mis-pdf-subtotal-row">
-                  <td colSpan={2} className="mis-total-label-cell">
-                    TOTAL
-                  </td>
-                  <td className="mis-qty-cell mis-bold-qty">
-                    {f3(grandTotalBilletIncoming)}
-                  </td>
-                </tr>
+                {/* TOTAL BILLETS INCOMING SUB TOTAL (shown when multiple rows) */}
+                {allBilletIncomingRows.length > 1 && (
+                  <tr className="mis-pdf-subtotal-row">
+                    <td className="mis-total-label-cell">
+                      TOTAL
+                    </td>
+                    <td className="mis-qty-cell mis-bold-qty">
+                      {f3(grandTotalBilletIncoming)}
+                    </td>
+                  </tr>
+                )}
               </>
             ) : (
               <tr>
@@ -889,18 +936,43 @@ export default function MisSheet() {
                     </button>
                   )}
                 </td>
-                <td className="mis-desc-cell" style={{ color: '#64748b', fontStyle: 'italic', padding: '6px' }}>
-                  No pending incoming balance in Material Purchase page
+                <td className="mis-desc-cell">
+                  {isEditMode ? (
+                    <input
+                      type="text"
+                      className="mis-desc-input"
+                      value={getDesc('billets_incoming_desc', 'No pending incoming balance in Material Purchase page')}
+                      placeholder="Size ya description..."
+                      onChange={(e) => handleDescChange('billets_incoming_desc', e.target.value)}
+                    />
+                  ) : (
+                    <span style={{ color: manualOverrides['billets_incoming_manual'] ? '#000000' : '#64748b', fontStyle: manualOverrides['billets_incoming_manual'] ? 'normal' : 'italic' }}>
+                      {getDesc('billets_incoming_desc', 'No pending incoming balance in Material Purchase page')}
+                    </span>
+                  )}
                 </td>
-                <td className="mis-qty-cell mis-bold-qty">0.000</td>
+                <td className="mis-qty-cell mis-bold-qty">
+                  {isEditMode ? (
+                    <input
+                      type="number"
+                      step="0.001"
+                      placeholder="0.000"
+                      className="mis-cell-input"
+                      value={manualOverrides['billets_incoming_manual'] !== undefined ? manualOverrides['billets_incoming_manual'] : ''}
+                      onChange={(e) => handleOverrideChange('billets_incoming_manual', e.target.value)}
+                    />
+                  ) : (
+                    <span>{f3(grandTotalBilletIncoming)}</span>
+                  )}
+                </td>
               </tr>
             )}
 
             {/* ========================================================= */}
-            {/* 3. SUMMARY METAL BALANCE */}
+            {/* 3. TOTAL BILLETS STOCK AND INCOMING (Calculated Sum) */}
             {/* ========================================================= */}
             <tr className="mis-summary-stat-row">
-              <td colSpan={2} className="mis-summary-label-cell">
+              <td colSpan={2} className="mis-summary-label-cell mis-bold-label">
                 {isEditMode ? (
                   <input
                     type="text"
@@ -912,7 +984,9 @@ export default function MisSheet() {
                   <span>{getDesc('lbl_sum_stock_inc', 'TOTAL BILLETS STOCK AND INCOMING')}</span>
                 )}
               </td>
-              <td className="mis-qty-cell mis-bold-qty">{f3(grandTotalBilletsStockAndIncoming)}</td>
+              <td className="mis-qty-cell mis-bold-qty">
+                {f3(grandTotalBilletsStockAndIncoming)}
+              </td>
             </tr>
             <tr className="mis-summary-stat-row">
               <td colSpan={2} className="mis-summary-label-cell">
